@@ -3,22 +3,24 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
+import ejs from 'ejs';
+import fs from 'fs';
 import { getUserByCredentials, getUserById, updateUserRole, getAllUsers } from './module/database';
 
 // Load environment variables
 dotenv.config();
 
-// Define interfaces
-interface User {
-  id: number;
-  username: string;
-  password: string;
-  role: 'admin' | 'user';
-}
-
-interface SessionData {
-  userId?: number;
-  role?: 'admin' | 'user';
+// Extend Express Request type to include user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: number;
+        username: string;
+        role: 'admin' | 'user';
+      };
+    }
+  }
 }
 
 declare module 'express-session' {
@@ -48,12 +50,35 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Routes
-app.get('/', (req: Request, res: Response): void => {
-  res.render('index', { user: req.session.userId ? { role: req.session.role } : null });
+app.get('/', async (req: Request, res: Response) => {
+  try {
+    const user = req.session.userId ? await getUserById(req.session.userId) : null;
+    res.render('layout', {
+      title: 'Admin Panel',
+      user: user,
+      body: ejs.render(fs.readFileSync(path.join(__dirname, 'views/index.ejs'), 'utf-8'), {
+        user: user,
+      }),
+    });
+  } catch (error) {
+    console.error('Error rendering home page:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
 app.get('/login', (req: Request, res: Response): void => {
-  res.render('login', { user: null });
+  try {
+    res.render('layout', {
+      title: 'Login',
+      user: null,
+      body: ejs.render(fs.readFileSync(path.join(__dirname, 'views/login.ejs'), 'utf-8'), {
+        user: null,
+      }),
+    });
+  } catch (error) {
+    console.error('Error rendering login page:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
 app.post('/login', async (req: Request, res: Response): Promise<void> => {
@@ -93,7 +118,13 @@ app.get('/profile', async (req: Request, res: Response): Promise<void> => {
       res.status(404).send('User not found');
       return;
     }
-    res.render('profile', { user });
+    res.render('layout', {
+      title: 'Profile',
+      user: user,
+      body: ejs.render(fs.readFileSync(path.join(__dirname, 'views/profile.ejs'), 'utf-8'), {
+        user: user,
+      }),
+    });
   } catch (error) {
     console.error('Profile error:', error);
     res.status(500).send('Internal server error');
@@ -109,9 +140,18 @@ app.get('/admin', async (req: Request, res: Response): Promise<void> => {
     res.status(403).send('Access denied');
     return;
   }
+  const user = await getUserById(req.session.userId);
+
   try {
     const users = await getAllUsers();
-    res.render('admin', { user: { role: req.session.role }, users });
+    console.log(users);
+    res.render('layout', {
+      title: 'Admin Panel',
+      user: user,
+      body: ejs.render(fs.readFileSync(path.join(__dirname, 'views/admin.ejs'), 'utf-8'), {
+        users: users,
+      }),
+    });
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).send('Internal server error');

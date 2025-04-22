@@ -1,21 +1,16 @@
-<%- include('layout', { 
-    title: 'Admin Panel', 
-    body: `
-        <h1>Admin Panel</h1>
-        <form action="/admin-roles" method="GET">
-            <div>
-                <label for="username">Select User:</label>
-                <select id="username" name="username" required>
-                    <option value="">-- Select a user --</option>
-                    ${users.map(user => `
-                        <option value="${user.username}">${user.username} (${user.role})</option>
-                    `).join('')}
-                </select>
-            </div>
-            <div>
-                <button type="submit" name="action" value="upgrade">Promote to Admin</button>
-                <button type="submit" name="action" value="downgrade">Demote to User</button>
-            </div>
-        </form>
-    `
-}) %> 
+<h1>Admin Panel</h1>
+<form action="/admin-roles" method="GET">
+    <div>
+        <label for="username">Select User:</label>
+        <select id="username" name="username" required>
+            <option value="">-- Select a user --</option>
+            <% users.forEach(function(user) { %>
+                <option value="<%= user.username %>"><%= user.username %> (<%= user.role %>)</option>
+            <% }); %>
+        </select>
+    </div>
+    <div>
+        <button type="submit" name="action" value="upgrade">Promote to Admin</button>
+        <button type="submit" name="action" value="downgrade">Demote to User</button>
+    </div>
+</form>

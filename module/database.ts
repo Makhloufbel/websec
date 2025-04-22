@@ -137,7 +137,28 @@ const updateUserRole = (username: string, role: 'admin' | 'user'): Promise<void>
   });
 };
 
+const getAllUsers = (): Promise<User[]> => {
+  return new Promise((resolve, reject) => {
+    const db = getDbConnection();
+    db.all('SELECT * FROM users ORDER BY username', (err: Error | null, rows: User[]) => {
+      db.close();
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
 initializeDatabase();
 
-export { getDbConnection, initializeDatabase, getUserByCredentials, getUserById, updateUserRole };
+export {
+  getDbConnection,
+  initializeDatabase,
+  getUserByCredentials,
+  getUserById,
+  updateUserRole,
+  getAllUsers,
+};
 export type { User };

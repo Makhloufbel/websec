@@ -4,11 +4,18 @@
         <h1>Admin Panel</h1>
         <form action="/admin-roles" method="GET">
             <div>
-                <label for="username">Username to promote:</label>
-                <input type="text" id="username" name="username" required>
-                <input type="hidden" name="action" value="upgrade">
+                <label for="username">Select User:</label>
+                <select id="username" name="username" required>
+                    <option value="">-- Select a user --</option>
+                    ${users.map(user => `
+                        <option value="${user.username}">${user.username} (${user.role})</option>
+                    `).join('')}
+                </select>
             </div>
-            <button type="submit">Promote to Admin</button>
+            <div>
+                <button type="submit" name="action" value="upgrade">Promote to Admin</button>
+                <button type="submit" name="action" value="downgrade">Demote to User</button>
+            </div>
         </form>
     `
 }) %> 

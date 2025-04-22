@@ -3,7 +3,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
-import { getUserByCredentials, getUserById, updateUserRole } from './module/database';
+import { getUserByCredentials, getUserById, updateUserRole, getAllUsers } from './module/database';
 
 // Load environment variables
 dotenv.config();
@@ -100,7 +100,7 @@ app.get('/profile', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.get('/admin', (req: Request, res: Response): void => {
+app.get('/admin', async (req: Request, res: Response): Promise<void> => {
   if (!req.session.userId) {
     res.redirect('/login');
     return;
@@ -109,7 +109,13 @@ app.get('/admin', (req: Request, res: Response): void => {
     res.status(403).send('Access denied');
     return;
   }
-  res.render('admin', { user: { role: req.session.role } });
+  try {
+    const users = await getAllUsers();
+    res.render('admin', { user: { role: req.session.role }, users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
 app.get('/admin-roles', async (req: Request, res: Response): Promise<void> => {
@@ -120,9 +126,10 @@ app.get('/admin-roles', async (req: Request, res: Response): Promise<void> => {
   const referer = req.get('Referer');
   const { username, action } = req.query;
 
-  if (referer && referer.includes('/admin') && action === 'upgrade') {
+  if (referer && referer.includes('/admin') && (action === 'upgrade' || action === 'downgrade')) {
     try {
-      await updateUserRole(username as string, 'admin');
+      const newRole = action === 'upgrade' ? 'admin' : 'user';
+      await updateUserRole(username as string, newRole);
       res.redirect('/profile');
     } catch (error) {
       console.error('Role update error:', error);

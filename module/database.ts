@@ -138,25 +138,44 @@ const updateUserRole = (username: string, role: 'admin' | 'user'): Promise<void>
 const getAllUsers = (): Promise<User[]> => {
   return new Promise((resolve, reject) => {
     const db = getDbConnection();
-    db.all('SELECT * FROM users ORDER BY username', (err: Error | null, rows: User[]) => {
-      db.close();
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
+    db.all(
+      'SELECT username, role FROM users ORDER BY username',
+      (err: Error | null, rows: User[]) => {
+        db.close();
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
       }
-    });
+    );
   });
 };
 
-initializeDatabase();
-
+const createUser = (username: string, password: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const db = getDbConnection();
+    db.run(
+      'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
+      [username, password, 'user'],
+      (err: Error | null) => {
+        db.close();
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      }
+    );
+  });
+};
 export {
   getDbConnection,
   initializeDatabase,
   getUserByCredentials,
   getUserById,
   updateUserRole,
+  createUser,
   getAllUsers,
 };
 export type { User };

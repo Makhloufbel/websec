@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getUserByCredentials } from '../module/database';
+import { createUser, getAllUsers, getUserByCredentials } from '../module/database';
 import ejs from 'ejs';
 import fs from 'fs';
 import path from 'path';
@@ -34,6 +34,32 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     }
   } catch (error) {
     console.error('Login error:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+router.get('/singup', (req: Request, res: Response): void => {
+  res.render('layout', {
+    title: 'Singup',
+    user: null,
+    body: ejs.render(fs.readFileSync(path.join(__dirname, '../views/singup.ejs'), 'utf-8'), {
+      user: null,
+    }),
+  });
+});
+
+router.post('/singup', async (req: Request, res: Response): Promise<void> => {
+  const { username, password } = req.body;
+  const users = await getAllUsers();
+  if (users.find(user => user.username === username)) {
+    res.status(400).send('User already exists');
+    return;
+  }
+  try {
+    await createUser(username, password);
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Singup error:', error);
     res.status(500).send('Internal server error');
   }
 });

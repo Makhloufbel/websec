@@ -1,3 +1,13 @@
-<h1>Profile</h1>
-<p>Username: <%= user.username %></p>
-<p>Role: <%= user.role %></p>
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">Profile</h1>
+    <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <span class="text-gray-700 font-medium">Username:</span>
+            <span class="text-gray-900"><%= user.username %></span>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <span class="text-gray-700 font-medium">Role:</span>
+            <span class="text-gray-900"><%= user.role %></span>
+        </div>
+    </div>
+</div>

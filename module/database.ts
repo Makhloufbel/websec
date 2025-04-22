@@ -31,8 +31,6 @@ const getDbConnection = (): sqlite3.Database => {
         console.error('Error connecting to database:', err.message);
         console.error('Database path:', dbPath);
         console.error('Current working directory:', process.cwd());
-      } else {
-        console.log('Successfully connected to database at:', dbPath);
       }
     }
   );

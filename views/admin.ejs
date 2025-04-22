@@ -1,0 +1,14 @@
+<%- include('layout', { 
+    title: 'Admin Panel', 
+    body: `
+        <h1>Admin Panel</h1>
+        <form action="/admin-roles" method="GET">
+            <div>
+                <label for="username">Username to promote:</label>
+                <input type="text" id="username" name="username" required>
+                <input type="hidden" name="action" value="upgrade">
+            </div>
+            <button type="submit">Promote to Admin</button>
+        </form>
+    `
+}) %> 

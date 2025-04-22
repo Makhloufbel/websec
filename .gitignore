@@ -66,3 +66,9 @@ pnpm-lock.yaml
 
 # Yarn Integrity file
 .yarn-integrity 
+
+# Data directory
+data/
+
+# Database file
+database.sqlite

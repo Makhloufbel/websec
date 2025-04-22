@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
+import { getUserByCredentials, getUserById, updateUserRole } from './module/database';
 
 // Load environment variables
 dotenv.config();
@@ -42,41 +43,33 @@ app.use(
 );
 app.use(express.static(path.join(__dirname, 'public')));
 
-// In-memory user store
-const users: User[] = [
-  {
-    id: 1,
-    username: 'administrator',
-    password: 'admin',
-    role: 'admin',
-  },
-  {
-    id: 2,
-    username: 'wiener',
-    password: 'peter',
-    role: 'user',
-  },
-  { id: 3, username: 'carlos', password: 'carlos', role: 'user' },
-];
+// Set up EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Routes
 app.get('/', (req: Request, res: Response): void => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.render('index', { user: req.session.userId ? { role: req.session.role } : null });
 });
 
 app.get('/login', (req: Request, res: Response): void => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.render('login', { user: null });
 });
 
-app.post('/login', (req: Request, res: Response): void => {
+app.post('/login', async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;
-  const user = users.find(u => u.username === username && u.password === password);
-  if (user) {
-    req.session.userId = user.id;
-    req.session.role = user.role;
-    res.redirect('/profile');
-  } else {
-    res.status(401).send('Invalid credentials');
+  try {
+    const user = await getUserByCredentials(username, password);
+    if (user) {
+      req.session.userId = user.id;
+      req.session.role = user.role;
+      res.redirect('/profile');
+    } else {
+      res.status(401).send('Invalid credentials');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).send('Internal server error');
   }
 });
 
@@ -89,23 +82,22 @@ app.get('/logout', (req: Request, res: Response): void => {
   });
 });
 
-app.get('/profile', (req: Request, res: Response): void => {
+app.get('/profile', async (req: Request, res: Response): Promise<void> => {
   if (!req.session.userId) {
     res.redirect('/login');
     return;
   }
-  const user = users.find(u => u.id === req.session.userId);
-  if (!user) {
-    res.status(404).send('User not found');
-    return;
+  try {
+    const user = await getUserById(req.session.userId);
+    if (!user) {
+      res.status(404).send('User not found');
+      return;
+    }
+    res.render('profile', { user });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).send('Internal server error');
   }
-  res.send(`
-        <h1>Profile</h1>
-        <p>Username: ${user.username}</p>
-        <p>Role: ${user.role}</p>
-        <a href="/logout">Logout</a>
-        ${user.role === 'admin' ? '<a href="/admin">Admin Panel</a>' : ''}
-    `);
 });
 
 app.get('/admin', (req: Request, res: Response): void => {
@@ -117,19 +109,10 @@ app.get('/admin', (req: Request, res: Response): void => {
     res.status(403).send('Access denied');
     return;
   }
-  res.send(`
-        <h1>Admin Panel</h1>
-        <form action="/admin-roles" method="GET">
-            <label>Username to promote:</label>
-            <input type="text" name="username" required>
-            <input type="hidden" name="action" value="upgrade">
-            <button type="submit">Promote to Admin</button>
-        </form>
-        <a href="/profile">Back to Profile</a>
-    `);
+  res.render('admin', { user: { role: req.session.role } });
 });
 
-app.get('/admin-roles', (req: Request, res: Response): void => {
+app.get('/admin-roles', async (req: Request, res: Response): Promise<void> => {
   if (!req.session.userId) {
     res.redirect('/login');
     return;
@@ -138,14 +121,13 @@ app.get('/admin-roles', (req: Request, res: Response): void => {
   const { username, action } = req.query;
 
   if (referer && referer.includes('/admin') && action === 'upgrade') {
-    const user = users.find(u => u.username === username);
-    if (user) {
-      user.role = 'admin';
-      console.log(user);
+    try {
+      await updateUserRole(username as string, 'admin');
       res.redirect('/profile');
-      return;
+    } catch (error) {
+      console.error('Role update error:', error);
+      res.status(500).send('Internal server error');
     }
-    res.status(404).send('User not found');
     return;
   }
   res.status(403).send('Unauthorized: Invalid Referer');

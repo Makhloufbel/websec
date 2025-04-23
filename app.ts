@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import ejs from 'ejs';
 import fs from 'fs';
-import { getUserById } from './module/database';
+import { getUserById, initializeDatabase } from './module/database';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 
@@ -34,6 +34,9 @@ declare module 'express-session' {
 
 const app: Express = express();
 const port = 3000;
+
+// db
+initializeDatabase();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));

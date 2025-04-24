@@ -1,11 +1,14 @@
-<div class="text-center">
-    <h1 class="text-4xl font-bold text-gray-900 mb-6">Welcome to the Web Security Demo</h1>
-    <p class="text-lg text-gray-600 mb-8">This is a demonstration of Referrer-based access control.</p>
-    <% if (!user) { %>
-        <p class="text-gray-600">
+<div class="homePage__container">
+    <div class="homePage__card">
+        <img src="/logo.png" alt="Lab logo" width="110px" height="120px">
+        <h2 style="color: var(--text)">Welcome to the Web Security Demo</h2>
+        <p style="color: var(--muted-text)">This is a demonstration of Referrer-based access control.</p>
+        <% if (!user) { %>
+            <p style="color: var(--muted-text)">
             Please 
-            <a href="/login" class="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">login</a> 
+            <a href="/login" style="color: var(--primary); text-decoration: underline;">login</a> 
             to access your profile.
-        </p>
-    <% } %>
+            </p>
+        <% } %>
+    </div>
 </div>

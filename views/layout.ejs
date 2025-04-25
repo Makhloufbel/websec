@@ -1,38 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
     <title><%= title %></title>
-</head>
-<body>
+  </head>
+  <body>
     <div class="root">
-        <nav class="bg-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex space-x-8">
-                        <a href="/" class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600 transition-colors duration-200 font-bold">Home</a>
-                        <% if (user) { %>
-                            <a href="/profile" class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600 transition-colors duration-200">Profile</a>
-                            <% if (user.role === 'admin') { %>
-                                <a href="/admin" class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600 transition-colors duration-200">Admin Panel</a>
-                            <% } %>
-                            <a href="/logout" class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600 transition-colors duration-200">Logout</a>
-                        <% } else { %>
-                            <a href="/login" class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600 transition-colors duration-200">Login</a>
-                            <a href="/singup" class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600 transition-colors duration-200">Singup</a>
-                        <% } %>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        <main>
-            <%- body %>
-        </main>
+      <nav
+        class="bg-white shadow-lg"
+        style="
+          background: white;
+          border-width: 1px;
+          border-style: solid;
+          border-color: var(--input-border);
+          border-top: 0px;
+          border-right: 0px;
+          border-left: 0px;
+          padding: 4px;
+          padding-left: 20px;
+          padding-right: 20px;
+        "
+      >
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+          <a href="/"><img src="/logo.png" alt="Demo logo" width="55px" height="55px" /></a>
+          <div>
+            <% if (user) { %>
+                <a href="/profile" style="margin-right: 4px;">Profile</a>
+                <% if (user.role === 'admin') { %>
+                    <a href="/admin" style="margin-right: 4px;">Admin Panel</a>
+                <% } %>
+                <a href="/logout" style="margin-right: 4px;">Logout</a>
+                <% } else { %>
+                <a href="/login" style="margin-right: 4px;">Login</a>
+                <a href="/singup" style="background-color: #0b0b0b; color: var(--background); padding: 6px; padding-left: 10px; padding-right: 10px; border-radius: var(--input-radius);">Singup</a>
+            <% } %>
+          </div>
+        </div>
+      </nav>
+      <main><%- body %></main>
     </div>
-</body>
-</html> 
+  </body>
+</html>

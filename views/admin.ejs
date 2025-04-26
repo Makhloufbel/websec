@@ -5,7 +5,7 @@
             <div>
                 <label for="username" style="display: block; font-size: 14px; font-weight: 500; color: #4a5568; margin-bottom: 8px;">Select User</label>
                 <select id="username" name="username" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px;">
-                    <option value="">-- Select a user --</option>
+                    <option value="">Select a user</option>
                     <% users.forEach(function(user) { %>
                         <option value="<%= user.username %>"><%= user.username %> (<%= user.role %>)</option>
                     <% }); %>
@@ -13,12 +13,28 @@
             </div>
             <div style="display: flex; gap: 10px;">
                 <button type="submit" name="action" value="upgrade" style="flex: 1; background-color: #48bb78; color: white; padding: 10px; border-radius: 4px; border: none; cursor: pointer;">
-                    Promote to Admin
+                    Promote
                 </button>
                 <button type="submit" name="action" value="downgrade" style="flex: 1; background-color: #f56565; color: white; padding: 10px; border-radius: 4px; border: none; cursor: pointer;">
-                    Demote to User
+                    Demote
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check for success or error message in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const successMessage = urlParams.get('success');
+    const errorMessage = urlParams.get('error');
+    
+    if (successMessage) {
+      window.showToast(successMessage, 'success');
+    }
+    if (errorMessage) {
+      window.showToast(errorMessage, 'error');
+    }
+  });
+</script>

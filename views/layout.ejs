@@ -45,6 +45,18 @@
         </div>
       </nav>
       <main><%- body %></main>
+      <div id="toast" class="toast"></div>
     </div>
+    <script>
+      window.showToast = function(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast ' + type;
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+    </script>
   </body>
 </html>

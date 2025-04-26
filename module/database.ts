@@ -5,7 +5,6 @@ import fs from 'fs';
 
 dotenv.config();
 
-// Define interfaces for our data structures
 interface User {
   id?: number;
   username: string;
@@ -50,18 +49,17 @@ const initializeDatabase = (): void => {
       )
     `);
 
-    // Insert target users if they don't exist
     const users: User[] = [
       { username: 'admin', password: 'admin', role: 'admin' },
-      { username: 'wiener', password: 'peter', role: 'user' },
-      { username: 'carlos', password: 'carlos', role: 'user' },
+      { username: 'ahmed', password: 'password', role: 'user' },
+      { username: 'mohamed', password: 'password', role: 'user' },
+      { username: 'yousef', password: 'password', role: 'user' },
+      { username: 'sara', password: 'password', role: 'user' },
     ];
 
-    // Use a transaction for better performance and atomicity
     db.run('BEGIN TRANSACTION');
 
     users.forEach(user => {
-      // Use INSERT OR IGNORE to handle duplicates gracefully
       db.run(
         'INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)',
         [user.username, user.password, user.role],

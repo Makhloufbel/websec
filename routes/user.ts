@@ -61,13 +61,19 @@ router.post('/update', async (req: Request, res: Response): Promise<void> => {
     res.redirect('/login');
     return;
   }
+
+  if (req.body.username === 'admin') {
+    res.redirect('/admin?error=Cannot modify admin user');
+    return;
+  }
+
   const referer = req.get('Referer');
   const { username, action } = req.body;
 
   if (referer && referer.includes('/admin') && (action === 'upgrade' || action === 'downgrade')) {
     try {
       await updateUserRole(username as string, action === 'upgrade' ? 'admin' : 'user');
-      res.redirect('/profile');
+      res.redirect('/admin?success=Role updated successfully');
     } catch (error) {
       console.error('Role update error:', error);
       res.status(500).send('Internal server error');

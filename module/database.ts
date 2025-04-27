@@ -1,6 +1,5 @@
 import sqlite3 from 'sqlite3';
 import path from 'path';
-import dotenv from 'dotenv';
 import fs from 'fs';
 
 dotenv.config();
@@ -19,7 +18,7 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const dbPath = process.env.DB_PATH || path.join(dataDir, 'database.sqlite');
+const dbPath = path.join(dataDir, 'database.sqlite');
 
 const getDbConnection = (): sqlite3.Database => {
   return new sqlite3.Database(
